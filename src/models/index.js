@@ -1,6 +1,10 @@
 const nconf = require('nconf');
 const mongoose = require('mongoose');
+const validator = require('validator');
+const _ = require('lodash');
+const bcrypt = require('bcrypt');
 const logger = require('../lib/logger');
+const { HTTPError, ERROR_CODES } = require('../lib/responses');
 
 /* ================================
  * Schema
@@ -15,6 +19,31 @@ const logger = require('../lib/logger');
     dateCreated: { type: Date, default: Date.now },
     dateUpdated: { type: Date, default: Date.now },
 });
+
+userSchema.statics.register = async function register (email, password, name, role = 'user') {
+
+    if (!validator.isEmail(email)) {
+        throw new HTTPError('Valid email required', 400, ERROR_CODES.INVALID_DATA);
+    }
+    if (!validator.isLength(password, {min:6, max:36})) {
+        throw new HTTPError('A password between 6 and 36 symbols required', 400, ERROR_CODES.INVALID_DATA);
+    }
+    if (_.isEmpty(name)) {
+        throw new HTTPError('Valid name required', 400, ERROR_CODES.MISSING_DATA);
+    }
+
+    let user
+    try {
+        user = await new this({ name, email, password: generatePassword(password), role, }).save()
+    } catch (err) {
+        if (err.code === 11000) {
+            throw new HTTPError(`The email ${email} is already in use`, 400, ERROR_CODES.INVALID_DATA)
+        } else {
+            throw err
+        }
+    }
+    return user;
+}
 
 /* ================================
  * Models
@@ -55,6 +84,13 @@ const connection = async function() {
         logger.error('MongoDB connection error:', err.message);
         throw err;
     }
+}
+
+function generatePassword(password) {
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds)
+    const hash = bcrypt.hashSync(password, salt)
+    return hash
 }
 
 module.exports = {
