@@ -23,7 +23,7 @@ async function decodeToken(token) {
     return data
 }
 
-function authorize(allowedRoles = ['user']) {
+function authorize(...allowedRoles) {
     return async (req, res, next) => {
 
         try {

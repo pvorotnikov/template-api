@@ -9,16 +9,25 @@ module.exports = function (app) {
     app.use('/api/users', router)
 
 
-    router.get('/me', auth.authorize(), async (req, res, next) => {
+    router.get('/me', auth.authorize('user', 'admin'), async (req, res, next) => {
         try {
-            res.json(new SuccessResponse())
+            const user = await User.findById(req.user.sub);
+            const data = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                dateCreated: user.dateCreated,
+                dateUpdated: user.dateUpdated,
+            };
+            res.json(new SuccessResponse(data));
         } catch (err) {
             res.status(err.status || 500).json(new ErrorResponse(err.message, err.code))
         }
     })
 
 
-    router.get('/', auth.authorize(['admin']), async (req, res, next) => {
+    router.get('/', auth.authorize('admin'), async (req, res, next) => {
         try {
             const users = await User.find()
             const data = users.map(u => ({
@@ -36,7 +45,7 @@ module.exports = function (app) {
     })
 
 
-    router.post('/', auth.authorize(['admin']), async (req, res, next) => {
+    router.post('/', auth.authorize('admin'), async (req, res, next) => {
         try {
             const { name, email, password, role } = req.body
             const user = await User.register(email, password, name, role)
@@ -74,7 +83,7 @@ module.exports = function (app) {
      *         schema:
      *           $ref: '#/definitions/User'
      */
-    router.get('/:id', auth.authorize(['admin']), async (req, res, next) => {
+    router.get('/:id', auth.authorize('admin'), async (req, res, next) => {
         try {
             const user = await User.findById(req.params.id);
             if (!user) {
