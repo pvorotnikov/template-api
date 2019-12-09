@@ -8,34 +8,6 @@ module.exports = function (app) {
     app.use('/api/users', router)
 
 
-    /**
-     * @swagger
-     *
-     * definitions:
-     *   NewUser:
-     *     type: object
-     *     required:
-     *       - name
-     *       - email
-     *       - password
-     *     properties:
-     *       name:
-     *         type: string
-     *       email:
-     *         type: string
-     *       password:
-     *         type: string
-     *         format: password
-     *   User:
-     *     allOf:
-     *       - $ref: '#/definitions/NewUser'
-     *       - required:
-     *         - id
-     *       - properties:
-     *         id:
-     *           type: string
-     */
-
     router.get('/me', auth.authorize(), async (req, res, next) => {
         try {
             res.json(new SuccessResponse())

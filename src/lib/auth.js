@@ -1,14 +1,20 @@
 const nconf = require('nconf')
 const jwt = require('jsonwebtoken')
 const util = require('util')
-const { ErrorResponse, HTTPError } = require('./responses')
+const { ErrorResponse, HTTPError, ERROR_CODES } = require('./responses')
 
 const sign = util.promisify(jwt.sign)
 const verify = util.promisify(jwt.verify)
 
-async function createToken(email, id, roles) {
-    const data = { email, id, roles }
-    const token = await sign(data, nconf.get('JWT_SECRET'), { expiresIn: '30m' })
+async function createToken(id, email, role) {
+    const data = { email, role }
+    const token = await sign(
+        data,
+        nconf.get('JWT_SECRET'), {
+            expiresIn: '30m',
+            subject: id,
+        }
+    );
     return token
 }
 
@@ -25,12 +31,12 @@ function authorize(allowedRoles = ['user']) {
             // verify header
             const header = req.headers.authorization
             if (!header) {
-                throw new HTTPError('Authorization header is required', 401)
+                throw new HTTPError('Authorization header is required', 401, ERROR_CODES.GENERAL)
             }
 
             // verify schema
             if (!header.startsWith('Bearer ')) {
-                throw new HTTPError('Bearer schema is required', 401)
+                throw new HTTPError('Bearer schema is required', 401, ERROR_CODES.GENERAL)
             }
 
             // extract token
@@ -41,25 +47,19 @@ function authorize(allowedRoles = ['user']) {
             try {
                 data = await decodeToken(token)
             } catch (err) {
-                throw new HTTPError('Invalid token', 401)
+                throw new HTTPError('Invalid token', 401, ERROR_CODES.INVALID_TOKEN)
             }
 
             // verify roles
-            let isAllowed = false
-            data.roles.forEach(r => {
-                if (allowedRoles.includes(r)) {
-                    isAllowed = true
-                }
-            })
-            if (!isAllowed) {
-                throw new HTTPError('Insufficient credentials', 403)
+            if (!allowedRoles.includes(data.role)) {
+                throw new HTTPError('Insufficient credentials', 403, ERROR_CODES.GENERAL)
             }
 
             req.user = data
             next()
 
         } catch (err) {
-            res.status(err.status || 500).json(new ErrorResponse(err.message))
+            res.status(err.status || 500).json(new ErrorResponse(err.message, err.code))
         }
 
     }

@@ -1,23 +1,38 @@
 // create configuration
-const nconf = require('nconf')
+const nconf = require('nconf');
 nconf.env().defaults({
   PORT: 3000,
   JWT_SECRET: 'signing-key',
   BASE_URL: 'http://127.0.0.1:3000',
-})
+  DB_CONNECTION: 'mongodb://127.0.0.1/blueprint',
+});
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const morgan = require('morgan')
-const cors = require('cors')
+const express = require('express');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const cors = require('cors');
 
-const { ErrorResponse, HTTPError } = require('./lib/responses')
-const logger = require('./lib/logger')
-const login = require('./api/login')
-const users = require('./api/users')
+const DB = require('./models')
+const logger = require('./lib/logger');
+const login = require('./api/login');
+const users = require('./api/users');
+const { ErrorResponse, HTTPError } = require('./lib/responses');
 
 // create app
-const app = express()
+const app = express();
+
+/* ================================
+ * Database
+ * ================================
+ */
+(async () => {
+    try {
+        const instance = await DB.connection();
+        app.set('db', instance);
+    } catch (err) {
+        logger.error(err.message);
+    }
+})();
 
 // setup middleware
 app.use(cors())

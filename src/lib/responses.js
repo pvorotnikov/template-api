@@ -1,3 +1,47 @@
+/**
+ * @swagger
+ *
+ * definitions:
+ *   NewUser:
+ *     type: object
+ *     required:
+ *       - name
+ *       - email
+ *       - password
+ *     properties:
+ *       name:
+ *         type: string
+ *       email:
+ *         type: string
+ *       password:
+ *         type: string
+ *         format: password
+ *   User:
+ *     type: object
+ *     properties:
+ *       id:
+ *         type: string
+ *       name:
+ *         type: string
+ *       email:
+ *         type: string
+ *       role:
+ *         type: string
+ *       dateCreated:
+ *         type: string
+ *       dateUpdated:
+ *         type: string
+ */
+
+const ERROR_CODES = {
+    GENERAL: 'GENERAL',
+    NOT_FOUND: 'NOT_FOUND',
+    MISSING_DATA: 'MISSING_DATA',
+    INVALID_DATA: 'INVALID_DATA',
+    EXPIRED_TOKEN: 'EXPIRED_TOKEN',
+    INVALID_TOKEN: 'INVALID_TOKEN',
+}
+
 class SuccessResponse {
     constructor(data) {
         this.status = 'ok'
@@ -6,7 +50,7 @@ class SuccessResponse {
 }
 
 class ErrorResponse {
-    constructor(message, errorCode = 'GENERAL_ERROR', data) {
+    constructor(message, errorCode = ERROR_CODES.GENERAL, data) {
         this.status = 'error'
         this.errorMessage = message || ''
         this.errorCode = errorCode
@@ -15,9 +59,10 @@ class ErrorResponse {
 }
 
 class HTTPError extends Error {
-    constructor(message = 'Error', status = 500, fileName, lineNumber) {
+    constructor(message = 'Error', status = 500, errorCode = ERROR_CODES.GENERAL, fileName, lineNumber) {
         super(message, fileName, lineNumber)
         this.status = status
+        this.code = errorCode
     }
 }
 
@@ -25,4 +70,5 @@ module.exports = {
     SuccessResponse,
     ErrorResponse,
     HTTPError,
+    ERROR_CODES,
 }
