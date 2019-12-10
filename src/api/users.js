@@ -30,6 +30,7 @@ module.exports = function (app) {
     })
 
 
+
     router.post('/', auth.authorize('admin'), async (req, res, next) => {
         try {
             const { name, email, password, role } = req.body
@@ -49,26 +50,7 @@ module.exports = function (app) {
     })
 
 
-    /**
-     * @swagger
-     *
-     * /api/users/:id:
-     *   get:
-     *     description: Get information about a specific user
-     *     produces:
-     *       - application/json
-     *     parameters:
-     *       - name: id
-     *         description: Users unique ID.
-     *         in: path
-     *         required: true
-     *         type: string
-     *     responses:
-     *       200:
-     *         description: User
-     *         schema:
-     *           $ref: '#/definitions/User'
-     */
+
     router.get('/:id', auth.authorize('admin'), async (req, res, next) => {
         try {
             const user = await User.findById(req.params.id);

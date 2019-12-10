@@ -1,38 +1,3 @@
-/**
- * @swagger
- *
- * definitions:
- *   NewUser:
- *     type: object
- *     required:
- *       - name
- *       - email
- *       - password
- *     properties:
- *       name:
- *         type: string
- *       email:
- *         type: string
- *       password:
- *         type: string
- *         format: password
- *   User:
- *     type: object
- *     properties:
- *       id:
- *         type: string
- *       name:
- *         type: string
- *       email:
- *         type: string
- *       role:
- *         type: string
- *       dateCreated:
- *         type: string
- *       dateUpdated:
- *         type: string
- */
-
 const ERROR_CODES = {
     GENERAL: 'GENERAL',
     NOT_FOUND: 'NOT_FOUND',

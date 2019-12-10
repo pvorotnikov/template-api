@@ -15,8 +15,6 @@ module.exports = function (app) {
      * /api/login:
      *   post:
      *     description: Login
-     *     produces:
-     *       - application/json
      *     requestBody:
      *       required: true
      *       content:
@@ -31,12 +29,15 @@ module.exports = function (app) {
      *     responses:
      *       200:
      *         description: User
-     *         schema:
-     *           allOf:
-     *             - $ref: '#/definitions/User'
-     *             - properties:
-     *               accessToken:
-     *                 type: string
+     *         content:
+     *           application/json:
+     *             schema:
+     *               allOf:
+     *                 - $ref: '#/components/schemas/User'
+     *                 - type: object
+     *                   properties:
+     *                     accessToken:
+     *                       type: string
      */
     router.post('/', async (req, res, next) => {
 
@@ -72,11 +73,9 @@ module.exports = function (app) {
     /**
      * @swagger
      *
-     * /api/login:
+     * /api/login/register:
      *   post:
      *     description: Login
-     *     produces:
-     *       - application/json
      *     requestBody:
      *       required: true
      *       content:
@@ -84,17 +83,19 @@ module.exports = function (app) {
      *           schema:
      *             type: object
      *             properties:
-     *               name:
-     *                 type: string
      *               email:
+     *                 type: string
+     *               name:
      *                 type: string
      *               password:
      *                 type: string
      *     responses:
      *       200:
      *         description: User
-     *         schema:
-     *           $ref: '#/definitions/User'
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/User'
      */
     router.post('/register', async (req, res, next) => {
         try {
