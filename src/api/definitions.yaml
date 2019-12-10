@@ -1,24 +1,29 @@
 components:
   schemas:
-    User:
+    UserResponse:
       type: object
-      required:
-        - id
-        - name
-        - email
-        - role
-        - dateCreated
-        - dateUpdated
       properties:
-        id:
+        status:
           type: string
-        name:
-          type: string
-        email:
-          type: string
-        role:
-          type: string
-        dateCreated:
-          type: string
-        dateUpdated:
-          type: string
+        data:
+          type: object
+          required:
+            - id
+            - name
+            - email
+            - role
+            - dateCreated
+            - dateUpdated
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+            role:
+              type: string
+            dateCreated:
+              type: string
+            dateUpdated:
+              type: string

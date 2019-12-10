@@ -12,6 +12,22 @@ module.exports = function (app) {
     app.use('/api/users', router)
 
 
+    /**
+     * @swagger
+     *
+     * /api/users:
+     *   get:
+     *     description: Get all users
+     *     responses:
+     *       200:
+     *         description: Users
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/UserResponse'
+     */
     router.get('/', auth.authorize('admin'), async (req, res, next) => {
         try {
             const users = await User.find()
@@ -30,7 +46,37 @@ module.exports = function (app) {
     })
 
 
-
+    /**
+     * @swagger
+     *
+     * /api/users:
+     *   post:
+     *     description: Create a new user
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [email, name, password]
+     *             properties:
+     *               email:
+     *                 type: string
+     *               name:
+     *                 type: string
+     *               password:
+     *                 type: string
+     *               role:
+     *                 type: string
+     *                 enum: [user, admin]
+     *     responses:
+     *       200:
+     *         description: User
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/UserResponse'
+     */
     router.post('/', auth.authorize('admin'), async (req, res, next) => {
         try {
             const { name, email, password, role } = req.body
@@ -50,7 +96,27 @@ module.exports = function (app) {
     })
 
 
-
+    /**
+     * @swagger
+     *
+     * /api/users/{id}:
+     *   get:
+     *     description: Get user
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         description: Unique user id
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: User
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/UserResponse'
+     */
     router.get('/:id', auth.authorize('admin'), async (req, res, next) => {
         try {
             const user = await User.findById(req.params.id);
@@ -72,7 +138,44 @@ module.exports = function (app) {
         }
     });
 
-
+    /**
+     * @swagger
+     *
+     * /api/users/{id}:
+     *   put:
+     *     description: Update user
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         description: Unique user id
+     *         required: true
+     *         schema:
+     *           type: string
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [email, name, password]
+     *             properties:
+     *               email:
+     *                 type: string
+     *               name:
+     *                 type: string
+     *               password:
+     *                 type: string
+     *               role:
+     *                 type: string
+     *                 enum: [user, admin]
+     *     responses:
+     *       200:
+     *         description: User
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/UserResponse'
+     */
     router.put('/:id', auth.authorize('admin'), async (req, res, next) => {
         try {
 
@@ -124,7 +227,27 @@ module.exports = function (app) {
         }
     });
 
-
+    /**
+     * @swagger
+     *
+     * /api/users/{id}:
+     *   delete:
+     *     description: Delete user
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         description: Unique user id
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: User
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/UserResponse'
+     */
     router.delete('/:id', auth.authorize('admin'), async (req, res, next) => {
         try {
 
@@ -149,6 +272,20 @@ module.exports = function (app) {
     });
 
 
+    /**
+     * @swagger
+     *
+     * /api/users/me:
+     *   get:
+     *     description: Get self
+     *     responses:
+     *       200:
+     *         description: User
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/UserResponse'
+     */
     router.get('/me', auth.authorize('user', 'admin'), async (req, res, next) => {
         try {
             const user = await User.findById(req.user.sub);
@@ -167,6 +304,33 @@ module.exports = function (app) {
     })
 
 
+    /**
+     * @swagger
+     *
+     * /api/users/me:
+     *   put:
+     *     description: Update self
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               email:
+     *                 type: string
+     *               name:
+     *                 type: string
+     *               password:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: User
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/UserResponse'
+     */
     router.put('/me', auth.authorize('user', 'admin'), async (req, res, next) => {
         try {
             const user = await User.findById(req.user.sub);

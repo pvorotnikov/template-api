@@ -21,6 +21,7 @@ module.exports = function (app) {
      *         application/json:
      *           schema:
      *             type: object
+     *             required: [email, password]
      *             properties:
      *               email:
      *                 type: string
@@ -33,11 +34,14 @@ module.exports = function (app) {
      *           application/json:
      *             schema:
      *               allOf:
-     *                 - $ref: '#/components/schemas/User'
+     *                 - $ref: '#/components/schemas/UserResponse'
      *                 - type: object
      *                   properties:
-     *                     accessToken:
-     *                       type: string
+     *                     data:
+     *                       type: object
+     *                       properties:
+     *                         accessToken:
+     *                           type: string
      */
     router.post('/', async (req, res, next) => {
 
@@ -75,13 +79,14 @@ module.exports = function (app) {
      *
      * /api/login/register:
      *   post:
-     *     description: Login
+     *     description: Register
      *     requestBody:
      *       required: true
      *       content:
      *         application/json:
      *           schema:
      *             type: object
+     *             required: [email, name, password]
      *             properties:
      *               email:
      *                 type: string
@@ -95,7 +100,7 @@ module.exports = function (app) {
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/User'
+     *               $ref: '#/components/schemas/UserResponse'
      */
     router.post('/register', async (req, res, next) => {
         try {
